@@ -1,0 +1,7 @@
+*.c
+*.txt
+*.exe
+*.o
+*.gcno
+*.gcda
+.DS_Store
