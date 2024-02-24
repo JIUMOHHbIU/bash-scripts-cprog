@@ -1,4 +1,5 @@
 *.c
+*comparator.sh
 *.txt
 *.exe
 *.o
