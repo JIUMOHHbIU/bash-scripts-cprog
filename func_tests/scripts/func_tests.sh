@@ -5,19 +5,39 @@ status="0"
 pass="\033[1;32mPASS\033[0m"
 fail="\033[1;31mFAIL\033[0m"
 
+one_level_tab="    "
+
 # Check options
-tabs=''
-if [ $# -gt 1 ]; then
+tabs=""
+verbose_opt=""
+if [ $# -gt 2 ]; then
 	echo >&2 Неправильное число параметров
 	status="160"
 fi
 
 if [ $# -gt 0 ]; then
-	if eval echo "$1" | grep -Eo "^	*$"; then
-		tabs="$tabs""$1"
+	if [ "$1" == '-v' ]; then
+		verbose_opt='-v'
 	else
-		echo >&2 Неправильный параметр 1: "$1"
-		status="160"
+		if eval echo "$1" | grep -Eo "^	*$"; then
+			tabs="$tabs""$1"
+		else
+			echo >&2 Неправильный параметр 1: "$1"
+			status="160"
+		fi
+	fi
+fi
+
+if [ $# -gt 1 ]; then
+	if [ "$2" == '-v' ]; then
+		verbose_opt='-v'
+	else
+		if eval echo "$2" | grep -Eo "^	*$"; then
+			tabs="$tabs""$2"
+		else
+			echo >&2 Неправильный параметр 2: "$2"
+			status="160"
+		fi
 	fi
 fi
 
@@ -29,21 +49,29 @@ if [ $status == "0" ]; then
 
 		for test_path in func_tests/data/"$group"*in*; do
 			if [[ -f "$test_path" ]]; then
-				passed="1"
-				if [ "$group" == "pos" ]; then
-					./func_tests/scripts/"$group"_case.sh "$test_path" "${test_path//in/out}"
-					passed=$?
-				else
-					./func_tests/scripts/"$group"_case.sh "$test_path"
-					passed=$?
-				fi
 				filename="${test_path//"func_tests/data/"/""}"
-				if [ $passed == "0" ]; then
+				if t_output=$(./func_tests/scripts/"$group"_case.sh "$test_path" "${test_path//in/out}" "$verbose_opt"); then
 					successful=$((successful+1))
 					echo -e "$tabs""$group" "$filename": "$pass"
 				else
 					status="1"
 					echo -e "$tabs""$group" "$filename": "$fail"
+
+					if [ "$verbose_opt" == '-v' ]; then
+						echo -e "$tabs""$one_level_tab"expected:
+						if [ -f "${test_path//in/out}" ]; then
+							while IFS= read -r line; do
+								echo -e "$tabs""$one_level_tab""$one_level_tab""$line"
+							done <<< "$(cat "${test_path//in/out}")"
+						fi
+
+						echo -e "$tabs""$one_level_tab"got:
+						if [ -n "$t_output" ]; then
+							while IFS= read -r line; do
+								echo -e "$tabs""$one_level_tab""$one_level_tab""$line"
+							done <<< "$t_output"
+						fi
+					fi
 				fi
 				counter=$((counter+1))
 			fi

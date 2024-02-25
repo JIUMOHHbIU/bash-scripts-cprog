@@ -42,7 +42,7 @@ fi
 # Full shellcheck, ignore SC2013 https://www.shellcheck.net/wiki/SC2013
 sc_opts=("-a" "-C" "-e" "SC2013")
 
-# Only yellow or worse, ignore SC2013 https://www.shellcheck.net/wiki/SC2013
+# Only yellow or worse, ignore SC2013
 # sc_opts=("--severity=warning" "-a" "-C" "-e" "SC2013")
 
 prefix="script"

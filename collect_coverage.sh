@@ -19,10 +19,6 @@ if [ $# -gt 0 ]; then
 fi
 
 if [ $status == "0" ]; then
-	./clean.sh
-	./build_coverage.sh
-	./func_tests/scripts/func_tests.sh > /dev/null
-
 	for source_file in *.c; do
 		coverage=$(gcov "$source_file" 2> /dev/null | grep -Eom 1 '[0-9]+\.[0-9]+%')
 		coverage_int=$(echo "$coverage" | grep -Eo '^[0-9]+')
@@ -34,7 +30,5 @@ if [ $status == "0" ]; then
 		fi
 	done
 fi
-
-./clean.sh
 
 exit $status

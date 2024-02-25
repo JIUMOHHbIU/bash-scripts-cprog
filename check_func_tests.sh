@@ -5,29 +5,48 @@ status="0"
 pass="\033[1;32mPASS\033[0m"
 fail="\033[1;31mFAIL\033[0m"
 
+one_level_tab="    "
+
 # Check options
-tabs=''
-if [ $# -gt 1 ]; then
+tabs=""
+verbose_opt=""
+if [ $# -gt 2 ]; then
 	echo >&2 Неправильное число параметров
-	status="1"
+	status="160"
 fi
 
 if [ $# -gt 0 ]; then
-	if eval echo "$1" | grep -Eo "^	*$"; then
-		tabs="$tabs""$1"
+	if [ "$1" == '-v' ]; then
+		verbose_opt='-v'
 	else
-		echo >&2 Неправильный параметр 1: "$1"
-		status="1"
+		if eval echo "$1" | grep -Eo "^	*$"; then
+			tabs="$tabs""$1"
+		else
+			echo >&2 Неправильный параметр 1: "$1"
+			status="160"
+		fi
+	fi
+fi
+
+if [ $# -gt 1 ]; then
+	if [ "$2" == '-v' ]; then
+		verbose_opt='-v'
+	else
+		if eval echo "$2" | grep -Eo "^	*$"; then
+			tabs="$tabs""$2"
+		else
+			echo >&2 Неправильный параметр 2: "$2"
+			status="160"
+		fi
 	fi
 fi
 
 prefix="testing on"
 if [ $status == "0" ]; then
-	builds=("debug_asan" "debug_msan" "debug_ubsan")
+	builds=("debug" "debug_asan" "debug_msan" "debug_ubsan")
 	for build in "${builds[@]}"; do
-		./clean.sh
 		./build_"$build".sh
-		if t_output=$(./func_tests/scripts/func_tests.sh "$tabs""	"); then
+		if t_output=$(./func_tests/scripts/func_tests.sh "$tabs""$one_level_tab" "$verbose_opt" 2>&1); then
 			echo -e "$tabs""$prefix" "$build": "$pass"
 		else
 			status="1"
@@ -38,7 +57,5 @@ if [ $status == "0" ]; then
 		fi
 	done
 fi
-
-./clean.sh
 
 exit $status

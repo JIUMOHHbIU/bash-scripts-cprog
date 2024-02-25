@@ -1,5 +1,5 @@
 *.c
-*comparator.sh
+func_tests/scirpts/comparator.sh
 *.txt
 *.exe
 *.o
