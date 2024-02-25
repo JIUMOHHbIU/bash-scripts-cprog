@@ -2,7 +2,7 @@
 
 status="0"
 
-if ! clang -DDEBUG -fsanitize=address -fno-omit-frame-pointer -g ./*.c -o app.exe; then
+if ! clang -std=c99 -DDEBUG -fcolor-diagnostics -fsanitize=address -fno-omit-frame-pointer -g ./*.c -o app.exe; then
 	status="1"
 fi
 

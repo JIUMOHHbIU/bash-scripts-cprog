@@ -21,7 +21,7 @@ comparator_output=""
 if [ $status == "0" ]; then
 	if ! ASAN_OPTIONS="color=always" MSAN_OPTIONS="color=always" UBSAN_OPTIONS="color=always" ./app.exe < "$1" > __tmp_out.txt 2>&1; then
 		if [ -f "$2" ]; then
-			comparator_output=$(./func_tests/scripts/comparator.sh __tmp_out.txt "$2" "$verbose_opt" 2>&1)
+			comparator_output=$(./func_tests/scripts/comparator.sh "$2" __tmp_out.txt "$verbose_opt" 2>&1)
 			status="$?"
 		else
 			status=0
