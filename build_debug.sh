@@ -3,7 +3,7 @@
 status="0"
 
 gcc_compile_args=("-std=c99" "-Wall" "-Werror" "-Wpedantic" "-Wextra" "-Wfloat-equal" "-Wfloat-conversion" "-Wvla" "-fdiagnostics-color")
-if ! gcc "${gcc_compile_args[@]}" -fdiagnostics-color -g -DDEBUG -c -fprofile-arcs -ftest-coverage -O0 ./*.c; then
+if ! gcc "${gcc_compile_args[@]}" -g -DDEBUG -c -fprofile-arcs -ftest-coverage -O0 ./*.c; then
 	status="1"
 fi
 

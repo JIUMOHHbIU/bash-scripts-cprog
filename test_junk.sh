@@ -114,4 +114,6 @@ if [ $status == "0" ]; then
 	echo "$t_output"
 fi
 
+rm -f ./*.o
+
 exit $status
