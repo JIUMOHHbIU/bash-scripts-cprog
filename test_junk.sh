@@ -92,7 +92,7 @@ fi
 if [ $status == "0" ]; then
 	# Run func_tests on all builds
 	prefix="USER FUNC TEST"
-	if t_output=$(./check_func_tests.sh "$tabs""$one_level_tab" "$verbose_opt" 2>&1); then
+	if t_output=$(./check_functional_tests.sh "$tabs""$one_level_tab" "$verbose_opt" 2>&1); then
 		echo -e "$tabs""$prefix" "$passed"
 	else
 		status="1"
