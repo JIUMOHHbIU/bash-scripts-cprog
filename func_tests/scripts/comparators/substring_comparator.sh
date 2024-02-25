@@ -42,8 +42,6 @@ fi
 
 tmpfile1=$(mktemp /tmp/tfile1.XXXXXX)
 tmpfile2=$(mktemp /tmp/tfile2.XXXXXX)
-echo > "$tmpfile1"
-echo > "$tmpfile2"
 
 grep < "$file_1" -oz 'string:.*' | sed 's/\x00//g' > "$tmpfile1"
 grep < "$file_2" -oz 'string:.*' | sed 's/\x00//g' > "$tmpfile2"
@@ -60,13 +58,14 @@ if [ "$(wc -c < "$tmpfile2")" == "0" ]; then
 	exit 160
 fi 
 
-if [[ $(md5sum < "$tmpfile1") == $(md5sum < "$tmpfile2") ]]; then
+if ! [[ $(md5sum < "$tmpfile1") == $(md5sum < "$tmpfile2") ]]; then
 	if [[ "$verbose_opt" == '-v' ]]; then
-		echo "not differ"
-	fi
-else
-	if [[ "$verbose_opt" == '-v' ]]; then
-		echo "differ"
+		echo filtred:
+		cat "$tmpfile1"
+		cat "$tmpfile2"
+		echo
+		echo diff on filtred:
+		diff "$tmpfile1" "$tmpfile2"
 	fi
 	status="1"
 fi

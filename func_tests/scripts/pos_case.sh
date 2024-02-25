@@ -17,21 +17,18 @@ if [ -n "$3" ]; then
 	verbose_opt='-v'
 fi
 
+comparator_output=""
 if [ $status == "0" ]; then
-	tmpfile=$(mktemp /tmp/tfile.XXXXXX)
-
-	if ASAN_OPTIONS="color=always" MSAN_OPTIONS="color=always" UBSAN_OPTIONS="color=always" ./app.exe < "$1" > "$tmpfile" 2>&1; then
-		./func_tests/scripts/comparator.sh "$tmpfile" "$2" "$verbose_opt"
+	if ASAN_OPTIONS="color=always" MSAN_OPTIONS="color=always" UBSAN_OPTIONS="color=always" ./app.exe < "$1" > __tmp_out.txt 2>&1; then
+		comparator_output=$(./func_tests/scripts/comparator.sh __tmp_out.txt "$2" "$verbose_opt" 2>&1)
 		status="$?"
 	else
 		status=1
 	fi
 fi
 
-if [ $status == "1" ] && [ "$verbose_opt" == '-v' ]; then
-	cat "$tmpfile"
+if [ "$verbose_opt" == '-v' ]; then
+	echo -e "$comparator_output"
 fi
-
-rm -f "$tmpfile"
 
 exit $status

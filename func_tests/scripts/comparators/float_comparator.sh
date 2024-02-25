@@ -44,8 +44,6 @@ pattern="^[+-]*(([0-9]+[.]?[0-9]*)|([0-9]*[.]?[0-9]+))([eE][+-]?[0-9]+)?$"
 
 tmpfile1=$(mktemp /tmp/tfile1.XXXXXX)
 tmpfile2=$(mktemp /tmp/tfile2.XXXXXX)
-echo > "$tmpfile1"
-echo > "$tmpfile2"
 
 for word in $(cat "$file_1"); do
     if [[ $word =~ $pattern ]]; then
@@ -59,13 +57,14 @@ for word in $(cat "$file_2"); do
     fi
 done
 
-if [[ $(md5sum < "$tmpfile1") == $(md5sum < "$tmpfile2") ]]; then
+if ! [[ $(md5sum < "$tmpfile1") == $(md5sum < "$tmpfile2") ]]; then
 	if [[ "$verbose_opt" == '-v' ]]; then
-		echo "not differ"
-	fi
-else
-	if [[ "$verbose_opt" == '-v' ]]; then
-		echo "differ"
+		echo filtred:
+		cat "$tmpfile1"
+		cat "$tmpfile2"
+		echo
+		echo diff on filtred:
+		diff "$tmpfile1" "$tmpfile2"
 	fi
 	status="1"
 fi

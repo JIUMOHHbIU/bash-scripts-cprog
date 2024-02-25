@@ -51,13 +51,14 @@ for word in $(cat "$file_2"); do
     echo "$word" >> "$tmpfile2"
 done
 
-if [[ $(md5sum < "$tmpfile1") == $(md5sum < "$tmpfile2") ]]; then
+if ! [[ $(md5sum < "$tmpfile1") == $(md5sum < "$tmpfile2") ]]; then
 	if [[ "$verbose_opt" == '-v' ]]; then
-		echo "not differ"
-	fi
-else
-	if [[ "$verbose_opt" == '-v' ]]; then
-		echo "differ"
+		echo filtred:
+		cat "$tmpfile1"
+		cat "$tmpfile2"
+		echo
+		echo diff on filtred:
+		diff "$tmpfile1" "$tmpfile2"
 	fi
 	status="1"
 fi

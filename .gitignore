@@ -4,5 +4,6 @@ func_tests/scripts/comparator.sh
 *.exe
 *.o
 *.gcno
+*.gcov
 *.gcda
 .DS_Store
