@@ -7,10 +7,10 @@ fail="\033[1;31mFAIL\033[0m"
 
 one_level_tab="    "
 
-# Check options
-tabs=""
 # ALWAYS VERBUSSY
 verbose_opt="-v"
+# Check options
+tabs=""
 if [ $# -gt 1 ]; then
 	echo >&2 Неправильное число параметров
 	status="160"

@@ -58,8 +58,4 @@ if [ $status == "0" ]; then
 	done
 fi
 
-if [ -f "__tmp_out.txt" ]; then
-	rm -f __tmp_out.txt
-fi
-
 exit $status

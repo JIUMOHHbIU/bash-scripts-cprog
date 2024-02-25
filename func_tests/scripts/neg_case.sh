@@ -19,7 +19,10 @@ fi
 
 comparator_output=""
 if [ $status == "0" ]; then
-	if ! ASAN_OPTIONS="color=always" MSAN_OPTIONS="color=always" UBSAN_OPTIONS="color=always" ./app.exe < "$1" > __tmp_out.txt 2>&1; then
+	ASAN_OPTIONS="color=always" MSAN_OPTIONS="color=always" UBSAN_OPTIONS="color=always" ./app.exe < "$1" > __tmp_out.txt 2>&1
+	rc="$?"
+	echo "$rc" > __tmp_rc.txt
+	if ! [ $rc == "0" ]; then
 		if [ -f "$2" ]; then
 			comparator_output=$(./func_tests/scripts/comparator.sh "$2" __tmp_out.txt "$verbose_opt" 2>&1)
 			status="$?"

@@ -43,6 +43,7 @@ fi
 
 if [ $status == "0" ]; then
 	groups=("pos" "neg")
+
 	for group in "${groups[@]}"; do
 		counter=0
 		successful=0
@@ -50,33 +51,36 @@ if [ $status == "0" ]; then
 		for test_path in func_tests/data/"$group"*in*; do
 			if [[ -f "$test_path" ]]; then
 				filename="${test_path//"func_tests/data/"/""}"
+				
 				if t_output=$(./func_tests/scripts/"$group"_case.sh "$test_path" "${test_path//in/out}" "$verbose_opt"); then
 					successful=$((successful+1))
 					echo -e "$tabs""$group" "$filename": "$pass"
 				else
 					status="1"
-					echo -e "$tabs""$group" "$filename": "$fail"
+					echo -e "$tabs""$group" "$filename": "$fail" "|" rc: "$(cat __tmp_rc.txt)"
 
 					if [ "$verbose_opt" == '-v' ]; then
 						echo -e "$tabs""$one_level_tab"input:
-						if [ -f "${test_path}" ]; then
-							while IFS= read -r line; do
-								echo -e "$tabs""$one_level_tab""$one_level_tab""$line"
-							done <<< "$(cat "${test_path}")"
-						fi
+						while IFS= read -r line; do
+							echo -e "$tabs""$one_level_tab""$one_level_tab""$line"
+						done <<< "$(cat "${test_path}")"
 
 						echo -e "$tabs""$one_level_tab"expected:
 						if [ -f "${test_path//in/out}" ]; then
 							while IFS= read -r line; do
 								echo -e "$tabs""$one_level_tab""$one_level_tab""$line"
 							done <<< "$(cat "${test_path//in/out}")"
+						else
+							echo "$tabs""$one_level_tab""$one_level_tab""<EMPTY FILE>"
 						fi
 
 						echo -e "$tabs""$one_level_tab"got:
-						if [ -n "$t_output" ]; then
+						if [ -f __tmp_out.txt ]; then
 							while IFS= read -r line; do
 								echo -e "$tabs""$one_level_tab""$one_level_tab""$line"
 							done <<< "$(cat __tmp_out.txt)"
+						else
+							echo "$tabs""$one_level_tab""$one_level_tab""<EMPTY FILE>"
 						fi
 
 						echo -e "$tabs""$one_level_tab"comparator output:
@@ -84,6 +88,8 @@ if [ $status == "0" ]; then
 							while IFS= read -r line; do
 								echo -e "$tabs""$one_level_tab""$one_level_tab""$line"
 							done <<< "$t_output"
+						else
+							echo "$tabs""$one_level_tab""$one_level_tab""<EMPTY FILE>"
 						fi
 					fi
 				fi
