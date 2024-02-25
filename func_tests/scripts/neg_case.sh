@@ -20,9 +20,9 @@ fi
 if [ $status == "0" ]; then
 	tmpfile=$(mktemp /tmp/tfile.XXXXXX)
 
-	if ! ASAN_OPTIONS="color=always" MSAN_OPTIONS="color=always" UBSAN_OPTIONS="color=always" ./app.exe < "$1" 2>&1 "$tmpfile"; then
+	if ! ASAN_OPTIONS="color=always" MSAN_OPTIONS="color=always" UBSAN_OPTIONS="color=always" ./app.exe < "$1" > "$tmpfile" 2>&1; then
 		if [ -f "$2" ]; then
-			./func_tests/scripts/comparator.sh "$tmpfile" "$2"
+			./func_tests/scripts/comparator.sh "$tmpfile" "$2" "$verbose_opt"
 			status="$?"
 		else
 			status=0
@@ -35,5 +35,7 @@ fi
 if [ $status == "1" ] && [ "$verbose_opt" == '-v' ]; then
 	cat "$tmpfile"
 fi
+
+rm -f "$tmpfile"
 
 exit $status
