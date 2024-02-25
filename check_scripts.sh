@@ -2,6 +2,8 @@
 
 status="0"
 
+one_level_tab="    "
+
 pass="\033[1;32mPASS\033[0m"
 failed="\033[1;31mFAILED\033[0m"
 
@@ -45,6 +47,9 @@ sc_opts=("-a" "-C" "-e" "SC2013")
 # Only yellow or worse, ignore SC2013
 # sc_opts=("--severity=warning" "-a" "-C" "-e" "SC2013")
 
+###############################
+# Run shellcheck on .sh files #
+###############################
 prefix="script"
 while IFS= read -r -d '' script
 do
@@ -57,7 +62,9 @@ do
 
 	if [ "$verbose_opt" == '-v' ]; then
 		if [ -n "$t_output" ]; then
-			echo "$t_output"
+			while IFS= read -r line; do
+				echo -e "$tabs""$one_level_tab""$line"
+			done <<< "$t_output"
 		fi
 	fi
 done <   <(find . -name "*.sh" -print0)

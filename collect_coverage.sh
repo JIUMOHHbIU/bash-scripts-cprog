@@ -18,6 +18,9 @@ if [ $# -gt 0 ]; then
 	fi
 fi
 
+##########################################
+# Call gcov on all .c files; 90% to pass #
+##########################################
 if [ $status == "0" ]; then
 	for source_file in *.c; do
 		coverage=$(gcov "$source_file" 2> /dev/null | grep -Eom 1 '[0-9]+\.[0-9]+%')

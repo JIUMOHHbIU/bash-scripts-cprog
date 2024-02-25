@@ -23,6 +23,7 @@ if [ $status == "0" ]; then
 	rc="$?"
 	echo "$rc" > __tmp_rc.txt
 	if ! [ $rc == "0" ]; then
+		# Check neg out, if possible
 		if [ -f "$2" ]; then
 			comparator_output=$(./func_tests/scripts/comparator.sh "$2" __tmp_out.txt "$verbose_opt" 2>&1)
 			status="$?"

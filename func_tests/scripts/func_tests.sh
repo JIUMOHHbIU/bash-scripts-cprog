@@ -60,11 +60,13 @@ if [ $status == "0" ]; then
 					echo -e "$tabs""$group" "$filename": "$fail" "|" rc: "$(cat __tmp_rc.txt)"
 
 					if [ "$verbose_opt" == '-v' ]; then
+						# Print input file
 						echo -e "$tabs""$one_level_tab"input:
 						while IFS= read -r line; do
 							echo -e "$tabs""$one_level_tab""$one_level_tab""$line"
 						done <<< "$(cat "${test_path}")"
 
+						# Print ref output file
 						echo -e "$tabs""$one_level_tab"expected:
 						if [ -f "${test_path//in/out}" ]; then
 							while IFS= read -r line; do
@@ -74,6 +76,7 @@ if [ $status == "0" ]; then
 							echo "$tabs""$one_level_tab""$one_level_tab""<EMPTY FILE>"
 						fi
 
+						# Print application output
 						echo -e "$tabs""$one_level_tab"got:
 						if [ -f __tmp_out.txt ]; then
 							while IFS= read -r line; do
@@ -83,6 +86,7 @@ if [ $status == "0" ]; then
 							echo "$tabs""$one_level_tab""$one_level_tab""<EMPTY FILE>"
 						fi
 
+						# Print comparator view
 						echo -e "$tabs""$one_level_tab"comparator output:
 						if [ -n "$t_output" ]; then
 							while IFS= read -r line; do

@@ -41,6 +41,9 @@ if [ $# -gt 1 ]; then
 	fi
 fi
 
+#################################
+# Run tests on different builds #
+#################################
 prefix="testing on"
 if [ $status == "0" ]; then
 	builds=("debug" "debug_asan" "debug_msan" "debug_ubsan")
