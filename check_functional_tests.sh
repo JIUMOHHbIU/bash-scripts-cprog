@@ -46,7 +46,7 @@ fi
 #################################
 prefix="testing on"
 if [ $status == "0" ]; then
-	builds=("debug" "debug_asan" "debug_msan" "debug_ubsan")
+	builds=("debug" "debug_asan" "debug_msan" "debug_ubsan" "release")
 	for build in "${builds[@]}"; do
 		./build_"$build".sh
 		if t_output=$(./func_tests/scripts/func_tests.sh "$tabs""$one_level_tab" "$verbose_opt" 2>&1); then
@@ -60,5 +60,7 @@ if [ $status == "0" ]; then
 		fi
 	done
 fi
+
+rm -f __tmp*
 
 exit $status
