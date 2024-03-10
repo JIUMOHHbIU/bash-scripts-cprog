@@ -44,6 +44,10 @@ if [ $# -gt 1 ]; then
 fi
 
 if [ $status == "0" ]; then
+	clang-format --style="Microsoft" ./*.c -i
+fi
+
+if [ $status == "0" ]; then
 	if [ -f "CodeChecker.exe" ]; then
 		# Run codestyle check
 		# https://git.iu7.bmstu.ru/IU7-Projects/CodeChecker

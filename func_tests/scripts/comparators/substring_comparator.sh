@@ -60,9 +60,18 @@ fi
 
 if ! [[ $(md5sum < "$tmpfile1") == $(md5sum < "$tmpfile2") ]]; then
 	if [[ "$verbose_opt" == '-v' ]]; then
-		echo filtred:
-		cat "$tmpfile1"
-		cat "$tmpfile2"
+		echo file 1 filtred:
+		if [ -s "$tmpfile1" ]; then
+			cat "$tmpfile1"
+		else
+			echo "<EMPTY FILE>"
+		fi
+		echo file 2 filtred:
+		if [ -s "$tmpfile2" ]; then
+			cat "$tmpfile2"
+		else
+			echo "<EMPTY FILE>"
+		fi
 		echo
 		echo diff on filtred:
 		diff "$tmpfile1" "$tmpfile2"
