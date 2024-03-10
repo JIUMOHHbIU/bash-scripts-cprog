@@ -41,4 +41,4 @@ if [ "$verbose_opt" == '-v' ]; then
 	fi
 fi
 
-exit $status	
+exit $status

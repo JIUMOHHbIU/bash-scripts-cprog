@@ -24,9 +24,9 @@ if [ $# -gt 0 ]; then
 		status="160"
 	fi
 fi
-###############################
-# Run shellcheck on .sh files #
-###############################
+##############################
+# Run all build_*.sh scripts #
+##############################
 prefix="build"
 builds=("release" "debug" "debug_asan" "debug_msan" "debug_ubsan")
 for build in "${builds[@]}"; do
