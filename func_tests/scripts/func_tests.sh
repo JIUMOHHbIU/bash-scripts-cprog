@@ -54,7 +54,9 @@ if [ $status == "0" ]; then
 				
 				if t_output=$(./func_tests/scripts/"$group"_case.sh "$test_path" "${test_path//in/out}" "$verbose_opt"); then
 					successful=$((successful+1))
-					echo -e "$tabs""$group" "$filename": "$pass"
+					if [ "$verbose_opt" == '-v' ]; then
+						echo -e "$tabs""$group" "$filename": "$pass"
+					fi
 				else
 					status="1"
 					echo -e "$tabs""$group" "$filename": "$fail" "|" rc: "$(cat __tmp_rc.txt)"
