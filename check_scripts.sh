@@ -54,13 +54,13 @@ prefix="script"
 while IFS= read -r -d '' script
 do
 	if t_output=$(shellcheck "${sc_opts[@]}" "$script"); then
-		echo -e "$tabs""$prefix" "$script": "$pass"
+		if [ "$verbose_opt" == '-v' ]; then
+			echo -e "$tabs""$prefix" "$script": "$pass"
+		fi
 	else
 		echo -e "$tabs""$prefix" "$script": "$failed"
 		status="1"
-	fi
 
-	if [ "$verbose_opt" == '-v' ]; then
 		if [ -n "$t_output" ]; then
 			while IFS= read -r line; do
 				echo -e "$tabs""$one_level_tab""$line"

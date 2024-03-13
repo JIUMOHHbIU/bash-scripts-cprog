@@ -67,27 +67,29 @@ if [ $status == "0" ]; then
 						while IFS= read -r line; do
 							echo -e "$tabs""$one_level_tab""$one_level_tab""$line"
 						done <<< "$(cat "${test_path}")"
+					fi
 
-						# Print ref output file
-						echo -e "$tabs""$one_level_tab"expected:
-						if [ -f "${test_path//in/out}" ]; then
-							while IFS= read -r line; do
-								echo -e "$tabs""$one_level_tab""$one_level_tab""$line"
-							done <<< "$(cat "${test_path//in/out}")"
-						else
-							echo "$tabs""$one_level_tab""$one_level_tab""<EMPTY FILE>"
-						fi
+					# Print ref output file
+					echo -e "$tabs""$one_level_tab"expected:
+					if [ -f "${test_path//in/out}" ]; then
+						while IFS= read -r line; do
+							echo -e "$tabs""$one_level_tab""$one_level_tab""$line"
+						done <<< "$(cat "${test_path//in/out}")"
+					else
+						echo "$tabs""$one_level_tab""$one_level_tab""<EMPTY FILE>"
+					fi
 
-						# Print application output
-						echo -e "$tabs""$one_level_tab"got:
-						if [ -f __tmp_out.txt ]; then
-							while IFS= read -r line; do
-								echo -e "$tabs""$one_level_tab""$one_level_tab""$line"
-							done <<< "$(cat __tmp_out.txt)"
-						else
-							echo "$tabs""$one_level_tab""$one_level_tab""<EMPTY FILE>"
-						fi
+					# Print application output
+					echo -e "$tabs""$one_level_tab"got:
+					if [ -f __tmp_out.txt ]; then
+						while IFS= read -r line; do
+							echo -e "$tabs""$one_level_tab""$one_level_tab""$line"
+						done <<< "$(cat __tmp_out.txt)"
+					else
+						echo "$tabs""$one_level_tab""$one_level_tab""<EMPTY FILE>"
+					fi
 
+					if [ "$verbose_opt" == '-v' ]; then
 						# Print comparator view
 						echo -e "$tabs""$one_level_tab"comparator output:
 						if [ -n "$t_output" ]; then

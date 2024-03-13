@@ -74,20 +74,26 @@ if [ $status == "0" ]; then
 		status="1"
 		echo -e "$tabs""$prefix" "$failed"
 	fi
-	echo "$t_output"
+	
+	if [ -n "$t_output" ]; then
+		echo "$t_output"
+	fi
 fi
 
 # If scripted
 if [ $status == "0" ]; then
 	# Check builds
 	prefix="BUILD"
-	if t_output=$(./check_builds.sh "$tabs""$one_level_tab" 2>&1); then
+	if t_output=$(./check_builds.sh "$tabs""$one_level_tab" "$verbose_opt" 2>&1); then
 		echo -e "$tabs""$prefix" "$passed"
 	else
 		status="1"
 		echo -e "$tabs""$prefix" "$failed"
 	fi
-	echo "$t_output"
+
+	if [ -n "$t_output" ]; then
+		echo "$t_output"
+	fi
 fi
 
 # If buildable
@@ -100,7 +106,10 @@ if [ $status == "0" ]; then
 		status="1"
 		echo -e "$tabs""$prefix" "$failed"
 	fi
-	echo "$t_output"
+
+	if [ -n "$t_output" ]; then
+		echo "$t_output"
+	fi
 fi
 
 # If testable
@@ -113,7 +122,10 @@ if [ $status == "0" ]; then
 		status="1"
 		echo -e "$tabs""$prefix" "$failed"
 	fi
-	echo "$t_output"
+	
+	if [ -n "$t_output" ]; then
+		echo "$t_output"
+	fi
 fi
 
 rm -f ./*.o
