@@ -73,6 +73,9 @@ prefix="testing on"
 if [ $status == "0" ]; then
 	cd __tmp_out_"$build" || exit 1
 	next_tabs_level="$tabs""$one_level_tab"
+
+	rm ./*.gcda 2> /dev/null
+
 	if [ -n "$parallel" ]; then
 		t_output=$("./func_tests/scripts/✨parallel_functional_testing✨.sh" "$next_tabs_level" "$verbose_opt" 2>&1)
 		status="$?"

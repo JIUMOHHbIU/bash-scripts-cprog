@@ -44,7 +44,7 @@ if [ $status == "0" ]; then
 		mkdir "$testing_folder"
 	fi
 	for group in "${groups[@]}"; do
-		counter=$(find ./func_tests/data/"$group"* | wc -l)
+		counter=$(find ./func_tests/data/"$group"* 2> /dev/null | wc -l)
 		unsuccessful=0
 		if [ "$counter" -gt 0 ]; then
 			parallel "./func_tests/scripts/✨run_solo_test_case✨.sh" ::: "$tabs" ::: "$verbose_opt" ::: "$group" ::: func_tests/data/"$group"*in*
