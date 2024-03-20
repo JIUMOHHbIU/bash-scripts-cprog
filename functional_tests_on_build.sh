@@ -2,11 +2,16 @@
 
 status="0"
 
+pass="\033[1;32mPASS\033[0m"
+fail="\033[1;31mFAIL\033[0m"
+
+one_level_tab="    "
+
 # Check options
 tabs=""
 verbose_opt=""
 parallel=""
-if [ $# -gt 3 ]; then
+if [ $# -gt 4 ]; then
 	echo >&2 Неправильное число параметров
 	status="160"
 fi
@@ -62,23 +67,27 @@ if [ $# -gt 2 ]; then
 	fi
 fi
 
-##############################
-# Run all build_*.sh scripts #
-##############################
-builds=("release" "debug" "debug_asan" "debug_msan" "debug_ubsan")
+build="$4"
+
+prefix="testing on"
 if [ $status == "0" ]; then
+	cd __tmp_out_"$build" || exit 1
+	next_tabs_level="$tabs""$one_level_tab"
 	if [ -n "$parallel" ]; then
-		parallel ./copy_on_build.sh ::: "$tabs" ::: "$verbose_opt" ::: "${builds[@]}"
-		if [ $status == "0" ]; then
-			status="$?"
-		fi
+		t_output=$("./func_tests/scripts/✨parallel_functional_testing✨.sh" "$next_tabs_level" "$verbose_opt" 2>&1)
+		status="$?"
 	else
-		for build in "${builds[@]}"; do
-			./copy_on_build.sh "$tabs" "$verbose_opt" "$build"
-			if [ $status == "0" ]; then
-				status="$?"
-			fi
-		done
+		t_output=$(./func_tests/scripts/func_tests.sh "$next_tabs_level" "$verbose_opt" 2>&1)
+		status="$?"
+	fi
+	if [ $status == "0" ]; then
+		echo -e "$tabs""$prefix" "$build": "$pass"
+	else
+		status="1"
+		echo -e "$tabs""$prefix" "$build": "$fail"
+	fi
+	if [ -n "$t_output" ]; then
+		echo "$t_output"
 	fi
 fi
 

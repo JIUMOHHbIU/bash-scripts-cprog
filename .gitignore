@@ -7,3 +7,5 @@ func_tests/scripts/comparator.sh
 *.gcov
 *.gcda
 .DS_Store
+__tmp*
+*.out

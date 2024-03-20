@@ -41,50 +41,55 @@ if [ $# -gt 1 ]; then
 	fi
 fi
 
+testing_folder="__tmp_testing"
 if [ $status == "0" ]; then
+	if [ ! -d "$testing_folder" ]; then
+		mkdir "$testing_folder"
+	fi
 	groups=("pos" "neg")
 
 	for group in "${groups[@]}"; do
 		counter=0
 		successful=0
+		for test_in in func_tests/data/"$group"*in*; do
+			if [[ -f "$test_in" ]]; then
+				filename="${test_in//"func_tests/data/"/""}"
+				test_out="${test_in//in/out}"
 
-		for test_path in func_tests/data/"$group"*in*; do
-			if [[ -f "$test_path" ]]; then
-				filename="${test_path//"func_tests/data/"/""}"
+				application_out="$testing_folder"/my_$(basename "${test_out}")
+				appication_rc="${application_out//out/rc}"
 				
-				if t_output=$(./func_tests/scripts/"$group"_case.sh "$test_path" "${test_path//in/out}" "$verbose_opt"); then
+				if t_output=$(./func_tests/scripts/"$group"_case.sh "$test_in" "$test_out" "$verbose_opt"); then
 					successful=$((successful+1))
 					if [ "$verbose_opt" == '-v' ]; then
 						echo -e "$tabs""$group" "$filename": "$pass"
 					fi
 				else
 					status="1"
-					echo -e "$tabs""$group" "$filename": "$fail" "|" rc: "$(cat __tmp_rc.txt)"
+					echo -e "$tabs""$group" "$filename": "$fail" "|" rc: "$(cat "$appication_rc")"
 
-					if [ "$verbose_opt" == '-v' ]; then
-						# Print input file
-						echo -e "$tabs""$one_level_tab"input:
-						while IFS= read -r line; do
-							echo -e "$tabs""$one_level_tab""$one_level_tab""$line"
-						done <<< "$(cat "${test_path}")"
-					fi
+					# Print input file
+					echo -e "$tabs""$one_level_tab"input:
+					while IFS= read -r line; do
+						echo -e "$tabs""$one_level_tab""$one_level_tab""$line"
+					done <<< "$(cat "${test_in}")"
 
 					# Print ref output file
 					echo -e "$tabs""$one_level_tab"expected:
-					if [ -f "${test_path//in/out}" ]; then
+					if [ -f "$test_out" ]; then
 						while IFS= read -r line; do
 							echo -e "$tabs""$one_level_tab""$one_level_tab""$line"
-						done <<< "$(cat "${test_path//in/out}")"
+						done <<< "$(cat "$test_out")"
 					else
 						echo "$tabs""$one_level_tab""$one_level_tab""<EMPTY FILE>"
 					fi
 
 					# Print application output
 					echo -e "$tabs""$one_level_tab"got:
-					if [ -f __tmp_out.txt ]; then
+					if [ -f "$application_out" ]; then
 						while IFS= read -r line; do
 							echo -e "$tabs""$one_level_tab""$one_level_tab""$line"
-						done <<< "$(cat __tmp_out.txt)"
+						done <<< "$(cat "$application_out")"
 					else
 						echo "$tabs""$one_level_tab""$one_level_tab""<EMPTY FILE>"
 					fi
@@ -107,6 +112,8 @@ if [ $status == "0" ]; then
 
 		if [ $counter -gt 0 ]; then
 			echo -e "$tabs""$((successful*100/counter))"% of "$group" tests passed
+		else
+			echo -e "$tabs""$group": "<NO TEST CASES>"
 		fi
 	done
 fi

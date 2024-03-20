@@ -2,15 +2,11 @@
 
 status="0"
 
-pass="\033[1;32mPASS\033[0m"
-fail="\033[1;31mFAIL\033[0m"
-
-one_level_tab="    "
-
 # Check options
 tabs=""
 verbose_opt=""
-if [ $# -gt 2 ]; then
+parallel=""
+if [ $# -gt 3 ]; then
 	echo >&2 Неправильное число параметров
 	status="160"
 fi
@@ -22,8 +18,12 @@ if [ $# -gt 0 ]; then
 		if eval echo "$1" | grep -Eo "^	*$"; then
 			tabs="$tabs""$1"
 		else
-			echo >&2 Неправильный параметр 1: "$1"
-			status="160"
+			if [ "$1" == "--parallel" ]; then
+				parallel="--parallel"
+			else
+				echo >&2 Неправильный параметр 1: "$1"
+				status="160"
+			fi
 		fi
 	fi
 fi
@@ -35,8 +35,29 @@ if [ $# -gt 1 ]; then
 		if eval echo "$2" | grep -Eo "^	*$"; then
 			tabs="$tabs""$2"
 		else
-			echo >&2 Неправильный параметр 2: "$2"
-			status="160"
+			if [ "$2" == "--parallel" ]; then
+				parallel="--parallel"
+			else
+				echo >&2 Неправильный параметр 2: "$2"
+				status="160"
+			fi
+		fi
+	fi
+fi
+
+if [ $# -gt 2 ]; then
+	if [ "$3" == '-v' ]; then
+		verbose_opt='-v'
+	else
+		if eval echo "$3" | grep -Eo "^	*$"; then
+			tabs="$tabs""$3"
+		else
+			if [ "$3" == "--parallel" ]; then
+				parallel="--parallel"
+			else
+				echo >&2 Неправильный параметр 3: "$3"
+				status="160"
+			fi
 		fi
 	fi
 fi
@@ -44,23 +65,21 @@ fi
 #################################
 # Run tests on different builds #
 #################################
-prefix="testing on"
+builds=("release" "debug" "debug_asan" "debug_msan" "debug_ubsan")
 if [ $status == "0" ]; then
-	builds=("debug" "debug_asan" "debug_msan" "debug_ubsan" "release")
-	for build in "${builds[@]}"; do
-		./build_"$build".sh > /dev/null 2>&1
-		if t_output=$(./func_tests/scripts/func_tests.sh "$tabs""$one_level_tab" "$verbose_opt" 2>&1); then
-			echo -e "$tabs""$prefix" "$build": "$pass"
-		else
-			status="1"
-			echo -e "$tabs""$prefix" "$build": "$fail"
+	if [ -n "$parallel" ]; then
+		parallel ./functional_tests_on_build.sh ::: "$tabs" ::: "$verbose_opt" ::: "$parallel" ::: "${builds[@]}"
+		if [ $status == "0" ]; then
+			status="$?"
 		fi
-		if [ -n "$t_output" ]; then
-			echo "$t_output"
-		fi
-	done
+	else
+		for build in "${builds[@]}"; do
+			./functional_tests_on_build.sh "$tabs" "$verbose_opt" "$parallel" "$build"
+			if [ $status == "0" ]; then
+				status="$?"
+			fi
+		done
+	fi
 fi
-
-rm -f __tmp*
 
 exit $status

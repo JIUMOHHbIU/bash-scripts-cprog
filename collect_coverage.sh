@@ -23,7 +23,7 @@ fi
 ##########################################
 if [ $status == "0" ]; then
 	for source_file in *.c; do
-		coverage=$(gcov "$source_file" 2> /dev/null | grep -Eom 1 '[0-9]+\.[0-9]+%')
+		coverage=$(gcov "$source_file" | grep -Eom 1 '[0-9]+\.[0-9]+%')
 		coverage_int=$(echo "$coverage" | grep -Eo '^[0-9]+')
 		if [ "$coverage_int" -gt "90" ]; then
 			echo -e "$tabs""$source_file": "\033[1;32mCoverage ratio $coverage\033[0m"

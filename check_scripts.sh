@@ -67,6 +67,6 @@ do
 			done <<< "$t_output"
 		fi
 	fi
-done <   <(find . -name "*.sh" -print0)
+done <   <(find . -name "*.sh" ! -path '*__tmp_out*' -print0)
 
 exit $status

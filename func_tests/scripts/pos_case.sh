@@ -17,13 +17,21 @@ if [ -n "$3" ]; then
 	verbose_opt='-v'
 fi
 
+testing_folder="__tmp_testing"
+
+test_in="$1"
+test_out="$2"
+
+application_out="$testing_folder"/my_$(basename "${test_out}")
+appication_rc=${application_out//out/rc}
+
 comparator_output=""
 if [ $status == "0" ]; then
-	ASAN_OPTIONS="color=always" MSAN_OPTIONS="color=always" UBSAN_OPTIONS="color=always" ./app.exe < "$1" > __tmp_out.txt 2>&1
+	ASAN_OPTIONS="color=always" MSAN_OPTIONS="color=always" UBSAN_OPTIONS="color=always" ./app.exe < "$test_in" > "$application_out" 2>&1
 	rc="$?"
-	echo "$rc" > __tmp_rc.txt
+	echo "$rc" > "$appication_rc"
 	if [ $rc == "0" ]; then
-		comparator_output=$(./func_tests/scripts/comparator.sh "$2" __tmp_out.txt "$verbose_opt" 2>&1)
+		comparator_output=$(./func_tests/scripts/comparator.sh "$test_out" "$application_out" "$verbose_opt" 2>&1)
 		status="$?"
 	else
 		status=1
