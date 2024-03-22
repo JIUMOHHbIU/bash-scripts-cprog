@@ -67,16 +67,19 @@ fi
 ##############################
 builds=("release" "debug" "debug_asan" "debug_msan" "debug_ubsan")
 if [ $status == "0" ]; then
+	current_hashsum=$(find ./func_tests/data/ -name "*.txt" ! -path '*__tmp_out*' -exec md5sum {} + | md5sum | cut -d ' ' -f 1)
 	if [ -n "$parallel" ]; then
-		parallel ./copy_on_build.sh ::: "$tabs" ::: "$verbose_opt" ::: "${builds[@]}"
+		parallel -k ./copy_on_build.sh ::: "$tabs" ::: "$verbose_opt" ::: "${builds[@]}" ::: "${current_hashsum[0]}"
+		rc=$?
 		if [ $status == "0" ]; then
-			status="$?"
+			status="$rc"
 		fi
 	else
 		for build in "${builds[@]}"; do
-			./copy_on_build.sh "$tabs" "$verbose_opt" "$build"
+			./copy_on_build.sh "$tabs" "$verbose_opt" "$build" "$current_hashsum"
+			rc=$?
 			if [ $status == "0" ]; then
-				status="$?"
+				status="$rc"
 			fi
 		done
 	fi

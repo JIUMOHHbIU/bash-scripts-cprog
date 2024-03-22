@@ -10,7 +10,7 @@ one_level_tab="    "
 # Check options
 tabs=""
 verbose_opt=""
-if [ $# -gt 3 ]; then
+if [ $# -gt 4 ]; then
 	echo >&2 Неправильное число параметров
 	status="160"
 fi
@@ -42,7 +42,7 @@ if [ $# -gt 1 ]; then
 fi
 
 build="$3"
-
+current_hashsum="$4"
 if [ $status == "0" ]; then
 	if [ ! -d __tmp_out_"$build" ]; then
 		mkdir __tmp_out_"$build"
@@ -54,22 +54,21 @@ if [ $status == "0" ]; then
 
 	mkdir -p __tmp_out_"$build"/func_tests/data/
 
-	current_hashsum=$(find . -name "*.txt" ! -path '*__tmp_out*' -exec md5sum {} +)
 	if [ -f __tmp_out_"$build"/tests_hashsum ]; then
 		old_hashsum=$(cat __tmp_out_"$build"/tests_hashsum)
 		if [ "$current_hashsum" != "$old_hashsum" ]; then
-			cp func_tests/data/*.txt __tmp_out_"$build"/func_tests/data/
+			cp func_tests/data/*.txt __tmp_out_"$build"/func_tests/data/		
+			echo "$current_hashsum" > __tmp_out_"$build"/tests_hashsum
 		fi
 	else
-		cp func_tests/data/*.txt __tmp_out_"$build"/func_tests/data/
+		cp func_tests/data/*.txt __tmp_out_"$build"/func_tests/data/	
+		echo "$current_hashsum" > __tmp_out_"$build"/tests_hashsum
 	fi
-	echo "$current_hashsum" > __tmp_out_"$build"/tests_hashsum
-
+	# cp func_tests/data/*.txt __tmp_out_"$build"/func_tests/data/	
 	mkdir -p __tmp_out_"$build"/func_tests/scripts/
 	cp func_tests/scripts/*.sh __tmp_out_"$build"/func_tests/scripts/
 
 	cd __tmp_out_"$build" || exit 1
-
 	prefix="build"
 	if t_output=$(./build_"$build".sh 2>&1); then
 		if [ "$verbose_opt" == '-v' ]; then
@@ -81,9 +80,11 @@ if [ $status == "0" ]; then
 	fi
 
 	if [ -n "$t_output" ]; then
+		echo
 		while IFS= read -r line; do
 			echo -e "$tabs""$one_level_tab""$line"
 		done <<< "$t_output"
+		echo
 	fi
 fi
 

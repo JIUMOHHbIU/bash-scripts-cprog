@@ -2,11 +2,16 @@
 
 status="0"
 
+passed="\033[1;32m(PASSED)\033[0m"
+failed="\033[1;31m(FAILED)\033[0m"
+
+one_level_tab="    "
+
 # Check options
 tabs=""
 verbose_opt=""
 parallel=""
-if [ $# -gt 3 ]; then
+if [ $# -gt 4 ]; then
 	echo >&2 Неправильное число параметров
 	status="160"
 fi
@@ -62,26 +67,21 @@ if [ $# -gt 2 ]; then
 	fi
 fi
 
-###############################
-# Run shellcheck on .sh files #
-###############################
+test_path="$4"
+
 if [ $status == "0" ]; then
-	if [ -n "$parallel" ]; then
-		find . -name "*.sh" ! -path '*__tmp_out*' -exec parallel -k -j 4 ./check_singular_script.sh ::: "$tabs" ::: "$verbose_opt" ::: {} +
-		rc=$?
-		if [ $status == "0" ]; then
-			status="$rc"
-		fi
+	prefix="${test_path//"/test_junk.sh"/""}"
+	cd "$prefix"
+
+	./clean.sh
+	if t_output=$(./test_junk.sh "$tabs""$one_level_tab" "$verbose_opt" "$parallel"); then
+		echo -e "$tabs""$prefix" "$passed"
 	else
-		while IFS= read -r -d '' script
-		do
-			./check_singular_script.sh "$tabs" "$verbose_opt" "$script"
-			rc=$?
-			if [ $status == "0" ]; then
-				status="$rc"
-			fi
-		done <   <(find . -name "*.sh" ! -path '*__tmp_out*' -print0)
+		status="1"
+		echo -e "$tabs""$prefix" "$failed"
 	fi
+	echo "$t_output"
+	./clean.sh
 fi
 
 exit $status

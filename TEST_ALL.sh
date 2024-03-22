@@ -2,6 +2,9 @@
 
 status="0"
 
+passed="\033[1;32m(PASSED)\033[0m"
+failed="\033[1;31m(FAILED)\033[0m"
+
 # Check options
 tabs=""
 verbose_opt=""
@@ -62,26 +65,38 @@ if [ $# -gt 2 ]; then
 	fi
 fi
 
-###############################
-# Run shellcheck on .sh files #
-###############################
-if [ $status == "0" ]; then
-	if [ -n "$parallel" ]; then
-		find . -name "*.sh" ! -path '*__tmp_out*' -exec parallel -k -j 4 ./check_singular_script.sh ::: "$tabs" ::: "$verbose_opt" ::: {} +
-		rc=$?
-		if [ $status == "0" ]; then
-			status="$rc"
-		fi
-	else
-		while IFS= read -r -d '' script
-		do
-			./check_singular_script.sh "$tabs" "$verbose_opt" "$script"
-			rc=$?
+script_python="\
+import sys
+lines = sys.stdin.read().split('\n')
+for line in lines:
+	if len(line) > 0 and line[0] == '*':
+		print(line.split(' ')[1].strip())
+"
+
+t=$(git branch | python3 -c "$script_python")
+if [ -n "$parallel" ]; then
+	t_output=$(parallel -k --bar ./TEST_SINGULAR.sh ::: "$tabs" ::: "$verbose_opt" ::: "$parallel" ::: $t*/test_junk.sh)
+	status="$?"
+
+	echo "$t_output"
+else
+	for test_path in $t*/test_junk.sh; do
+		if [[ -f "$test_path" ]]; then
+			./TEST_SINGULAR.sh "$tabs" "$verbose_opt" "$parallel" "$test_path"
+			rc="$?"
 			if [ $status == "0" ]; then
 				status="$rc"
 			fi
-		done <   <(find . -name "*.sh" ! -path '*__tmp_out*' -print0)
-	fi
+		fi
+	done
+fi
+
+echo
+prefix="verdict:"
+if [ $status == "0" ]; then
+	echo -e "$tabs""$prefix" "$passed"
+else
+	echo -e "$tabs""$prefix" "$failed"
 fi
 
 exit $status

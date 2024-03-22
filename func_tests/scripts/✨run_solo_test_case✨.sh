@@ -55,6 +55,8 @@ else
 	status="1"
 	echo -e "$tabs""$group" "$filename": "$fail" "|" rc: "$(cat "$appication_rc")"
 
+	echo
+
 	# Print input file
 	echo -e "$tabs""$one_level_tab"input:
 	while IFS= read -r line; do
@@ -92,6 +94,8 @@ else
 			echo "$tabs""$one_level_tab""$one_level_tab""<EMPTY FILE>"
 		fi
 	fi
+
+	echo
 fi
 
 exit $status

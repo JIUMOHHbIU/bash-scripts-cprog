@@ -4,11 +4,6 @@ status="0"
 
 # Check options
 tabs=''
-if [ $# -gt 1 ]; then
-	echo >&2 Неправильное число параметров
-	status="160"
-fi
-
 if [ $# -gt 0 ]; then
 	if eval echo "$1" | grep -Eo "^	*$"; then
 		tabs="$tabs""$1"

@@ -6,7 +6,7 @@ status="0"
 tabs=""
 verbose_opt=""
 parallel=""
-if [ $# -gt 3 ]; then
+if [ $# -gt 5 ]; then
 	echo >&2 Неправильное число параметров
 	status="160"
 fi
@@ -62,25 +62,15 @@ if [ $# -gt 2 ]; then
 	fi
 fi
 
-###############################
-# Run shellcheck on .sh files #
-###############################
+build="$4"
+current_hashsum="$5"
 if [ $status == "0" ]; then
-	if [ -n "$parallel" ]; then
-		find . -name "*.sh" ! -path '*__tmp_out*' -exec parallel -k -j 4 ./check_singular_script.sh ::: "$tabs" ::: "$verbose_opt" ::: {} +
-		rc=$?
-		if [ $status == "0" ]; then
-			status="$rc"
-		fi
-	else
-		while IFS= read -r -d '' script
-		do
-			./check_singular_script.sh "$tabs" "$verbose_opt" "$script"
-			rc=$?
-			if [ $status == "0" ]; then
-				status="$rc"
-			fi
-		done <   <(find . -name "*.sh" ! -path '*__tmp_out*' -print0)
+	if ! ./copy_on_build.sh "$tabs" "$verbose_opt" "$build" "$current_hashsum"; then
+		exit 1
+	fi
+
+	if  ! ./functional_tests_on_build.sh "$tabs" "$verbose_opt" "$parallel" "$build"; then
+		exit 1
 	fi
 fi
 

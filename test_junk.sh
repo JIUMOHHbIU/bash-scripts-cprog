@@ -68,93 +68,43 @@ if [ $# -gt 2 ]; then
 fi
 
 if [ $status == "0" ]; then
-	if [ -f "CodeChecker.exe" ]; then
-		# Run codestyle check
-		# https://git.iu7.bmstu.ru/IU7-Projects/CodeChecker
-		prefix="CODESTYLE"
-		for file in *.c; do
-			if t_output=$(./CodeChecker.exe "$file" 2>&1); then
-				echo -e "$tabs""$prefix" "$passed"
-			else
-				# since CodeChecker is NOT properly implemented, ignore result
-				# status="1"
-				echo -e "$tabs""$prefix" "$failed"
-			fi
-			if [ -n "$t_output" ]; then
-				while IFS= read -r line; do
-					echo "$tabs""$one_level_tab""$line"
-				done <<< "$t_output"
+	prefixes=("CODESTYLE" "SHELLCHECK" "BUILD and USER FUNC TEST")
+	steps=("./check_codestyle.sh" "./check_scripts.sh" "./check_builds_and_test.sh")
+	if [ -n "$parallel" ]; then
+		parallel -k --link ./run_singular_step.sh ::: "$tabs" ::: "$verbose_opt" ::: "$parallel" ::: "${prefixes[@]}" ::: "${steps[@]}"
+		rc=$?
+		if [ $status == "0" ]; then
+			status="$rc"
+		fi
+	else
+		for (( i=0; i<${#steps[*]}; ++i)); do
+			./run_singular_step.sh "$tabs" "$verbose_opt" "$parallel" "${prefixes[$i]}" "${steps[$i]}"
+			rc=$?
+			if [ $status == "0" ]; then
+				status="$rc"
 			fi
 		done
 	fi
 fi
 
 if [ $status == "0" ]; then
-	# Run sc
-	prefix="SHELLCHECK"
-	if t_output=$(./check_scripts.sh "$tabs""$one_level_tab" "$verbose_opt" 2>&1); then
-		echo -e "$tabs""$prefix" "$passed"
-	else
-		status="1"
-		echo -e "$tabs""$prefix" "$failed"
-	fi
-	
-	if [ -n "$t_output" ]; then
-		echo "$t_output"
-	fi
-fi
-
-# If scripted
-if [ $status == "0" ]; then
-	# Check builds
-	prefix="BUILD"
-	if t_output=$(./check_builds.sh "$tabs""$one_level_tab" "$verbose_opt" "$parallel" 2>&1); then
-		echo -e "$tabs""$prefix" "$passed"
-	else
-		status="1"
-		echo -e "$tabs""$prefix" "$failed"
-	fi
-
-	if [ -n "$t_output" ]; then
-		echo "$t_output"
-	fi
-fi
-
-# If buildable
-if [ $status == "0" ]; then
-	prefix="USER FUNC TEST"
-	if t_output=$(./check_functional_tests.sh "$tabs""$one_level_tab" "$verbose_opt" "$parallel" 2>&1); then
-		echo -e "$tabs""$prefix" "$passed"
-	else
-		status="1"
-		echo -e "$tabs""$prefix" "$failed"
-	fi
-
-	if [ -n "$t_output" ]; then
-		echo "$t_output"
-	fi
-fi
-
-# If tested
-if [ $status == "0" ]; then
 	# Collect coverage
 	cd __tmp_out_debug || exit 1
 
 	prefix="COVERAGE"
-	if t_output=$(./collect_coverage.sh "$tabs""$one_level_tab" 2>&1); then
-		echo -e "$tabs""$prefix" "$passed"
+	echo -n "$tabs""$prefix"
+	if t_output=$(./collect_coverage.sh "$tabs""$one_level_tab" "$verbose_opt" "$parallel" 2>&1); then
+		echo -e " $passed"
 	else
 		status="1"
-		echo -e "$tabs""$prefix" "$failed"
+		echo -e " $failed"
 	fi
-	
+
 	if [ -n "$t_output" ]; then
-		echo "$t_output"
+		echo -e "$t_output"
 	fi
 
 	cd ..
 fi
-
-rm -f ./*.o
 
 exit $status

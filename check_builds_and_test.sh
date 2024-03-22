@@ -62,25 +62,26 @@ if [ $# -gt 2 ]; then
 	fi
 fi
 
-###############################
-# Run shellcheck on .sh files #
-###############################
+##############################
+# Run all build_*.sh scripts #
+##############################
+builds=("release" "debug" "debug_asan" "debug_msan" "debug_ubsan")
 if [ $status == "0" ]; then
+	current_hashsum=$(find ./func_tests/data/ -name "*.txt" ! -path '*__tmp_out*' -exec md5sum {} + | md5sum | cut -d ' ' -f 1)
 	if [ -n "$parallel" ]; then
-		find . -name "*.sh" ! -path '*__tmp_out*' -exec parallel -k -j 4 ./check_singular_script.sh ::: "$tabs" ::: "$verbose_opt" ::: {} +
+		parallel -k ./copy_and_test.sh ::: "$tabs" ::: "$verbose_opt" ::: "$parallel" ::: "${builds[@]}" ::: "${current_hashsum[0]}"
 		rc=$?
 		if [ $status == "0" ]; then
 			status="$rc"
 		fi
 	else
-		while IFS= read -r -d '' script
-		do
-			./check_singular_script.sh "$tabs" "$verbose_opt" "$script"
+		for build in "${builds[@]}"; do
+			./copy_and_test.sh "$tabs" "$verbose_opt" "$parallel" "$build" "$current_hashsum"
 			rc=$?
 			if [ $status == "0" ]; then
 				status="$rc"
 			fi
-		done <   <(find . -name "*.sh" ! -path '*__tmp_out*' -print0)
+		done
 	fi
 fi
 

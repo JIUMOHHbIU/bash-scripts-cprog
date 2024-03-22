@@ -68,15 +68,17 @@ fi
 builds=("release" "debug" "debug_asan" "debug_msan" "debug_ubsan")
 if [ $status == "0" ]; then
 	if [ -n "$parallel" ]; then
-		parallel ./functional_tests_on_build.sh ::: "$tabs" ::: "$verbose_opt" ::: "$parallel" ::: "${builds[@]}"
+		parallel -k ./functional_tests_on_build.sh ::: "$tabs" ::: "$verbose_opt" ::: "$parallel" ::: "${builds[@]}"
+		rc=$?
 		if [ $status == "0" ]; then
-			status="$?"
+			status="$rc"
 		fi
 	else
 		for build in "${builds[@]}"; do
 			./functional_tests_on_build.sh "$tabs" "$verbose_opt" "$parallel" "$build"
+			rc=$?
 			if [ $status == "0" ]; then
-				status="$?"
+				status="$rc"
 			fi
 		done
 	fi
