@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# id=ca88af60f876ce55f959cafa0a6e0b13
+
 gcc_compile_args=("-std=c99" "-Wall" "-Werror" "-Wpedantic" "-Wextra" "-Wfloat-equal" "-Wfloat-conversion" "-Wvla" "-fdiagnostics-color")
 
 if ! gcc "${gcc_compile_args[@]}" -g -DDEBUG -c -fprofile-arcs -ftest-coverage -O0 ./*.c; then

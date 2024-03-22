@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# id=746d86d2838ef6e29e24abba8a8cdbf1
+
 status="0"
 
 # Check options

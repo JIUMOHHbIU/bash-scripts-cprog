@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# id=aa9cd4a29a736179bcfbcfdcde40c16c
+
 # Substring comparator
 
 status="0"

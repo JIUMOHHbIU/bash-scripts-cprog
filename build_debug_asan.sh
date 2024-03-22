@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# id=6200dad0ca26843ca77f567ad460aec5
+
 if ! clang-17 -c -std=c99 -Weverything \
 	-Wno-used-but-marked-unused \
 	-fcolor-diagnostics \

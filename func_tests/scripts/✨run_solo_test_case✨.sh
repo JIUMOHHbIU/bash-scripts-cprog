@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# id=0973cd8edd5a8a7174a37d6d81b161cc
+
 status="0"
 
 pass="\033[1;32mPASS\033[0m"
