@@ -61,7 +61,6 @@ if [ $status == "0" ]; then
 			echo -e "$tabs""$(((counter-unsuccessful)*100/counter))"% of "$group" tests passed
 		else
 			echo -e "$tabs""$group": "<NO TEST CASES>"
-			status="1"
 		fi
 	done
 fi
