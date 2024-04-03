@@ -50,13 +50,18 @@ if [ $status == "0" ]; then
 		unsuccessful=0
 		if [ "$counter" -gt 0 ]; then
 			parallel "./func_tests/scripts/✨run_solo_test_case✨.sh" ::: "$tabs" ::: "$verbose_opt" ::: "$group" ::: func_tests/data/"$group"*in*
-			unsuccessful=$((unsuccessful + $?))
+			rc=$?
+			if [ $status == "0" ]; then
+				status="$rc"
+			fi
+			unsuccessful=$((unsuccessful + "$rc"))
 		fi
 
 		if [ "$counter" -gt 0 ]; then
 			echo -e "$tabs""$(((counter-unsuccessful)*100/counter))"% of "$group" tests passed
 		else
 			echo -e "$tabs""$group": "<NO TEST CASES>"
+			status="1"
 		fi
 	done
 fi
