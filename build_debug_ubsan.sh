@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# id=1924a5a5195086ab6f2e3bf6bbb7c0a8
+# @id=1924a5a5195086ab6f2e3bf6bbb7c0a8
 
 if ! clang-17 -c -std=c99 -Weverything \
 	-Wno-used-but-marked-unused \

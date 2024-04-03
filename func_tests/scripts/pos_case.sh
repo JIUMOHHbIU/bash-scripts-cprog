@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# id=c30b126fc3091abe35b1155531562462
+# @id=c30b126fc3091abe35b1155531562462
 
 status="0"
 

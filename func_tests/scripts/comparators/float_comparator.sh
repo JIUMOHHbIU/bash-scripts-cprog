@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# id=ee6d2d4c1915cfdbd2273f76453b03ea
+# @id=ee6d2d4c1915cfdbd2273f76453b03ea
 
 # Float comparator
 

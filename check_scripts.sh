@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# id=60ec910591db8256caff4e1d27140f1f
+# @id=60ec910591db8256caff4e1d27140f1f
 
 status="0"
 
@@ -82,7 +82,7 @@ if [ $status == "0" ]; then
 			if [ $status == "0" ]; then
 				status="$rc"
 			fi
-		done <   <(find . -name "*.sh" ! -path '*__tmp_out*' -print0)
+		done <   <(find . -name "*.sh" ! -path '*__tmp*' -print0)
 	fi
 fi
 

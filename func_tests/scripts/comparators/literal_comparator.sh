@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# id=ef41ea6ea0d7e2e9d27f0370bda39891
+# @id=ef41ea6ea0d7e2e9d27f0370bda39891
 
 # Literal comparator
 
