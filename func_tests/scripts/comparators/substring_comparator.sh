@@ -45,8 +45,8 @@ fi
 tmpfile1=$(mktemp /tmp/tfile1.XXXXXX)
 tmpfile2=$(mktemp /tmp/tfile2.XXXXXX)
 
-grep < "$file_1" -oz 'string:.*' | sed 's/\x00//g' > "$tmpfile1"
-grep < "$file_2" -oz 'string:.*' | sed 's/\x00//g' > "$tmpfile2"
+grep < "$file_1" -oz 'Result:.*' | sed 's/\x00//g' > "$tmpfile1"
+grep < "$file_2" -oz 'Result:.*' | sed 's/\x00//g' > "$tmpfile2"
 
 if [ "$(wc -c < "$tmpfile1")" == "0" ]; then
 	echo >&2 'Входной файл 1 не содержат подстрок вида "«Result: "'
