@@ -4,8 +4,6 @@
 # @const
 
 python_script="\
-#!/usr/bin/python3.11
-
 import subprocess
 import pprint
 import unicodedata
