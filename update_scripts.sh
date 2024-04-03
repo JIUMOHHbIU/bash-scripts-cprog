@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # @id=f4aee6de86c0b4d1ce7aaa0be89a9280
-# @const
 
 python_script="\
 import subprocess
@@ -9,13 +8,13 @@ import pprint
 import unicodedata
 
 
-def beautify_stdout(s):
+def beautify(s):
 	return s.decode('utf-8').strip()
 
 
 def run_sp(args):
 	sp = subprocess.run([*args], capture_output=True)
-	return { 'rc': sp.returncode, 'stdout': beautify_stdout(sp.stdout) }
+	return { 'rc': sp.returncode, 'stdout': beautify(sp.stdout), 'stderr': beautify(sp.stderr) }
 
 
 def check_output(args):
@@ -27,7 +26,7 @@ def grep(pattern, path):
 
 
 def update_repo(repo_link, scripts_dir):
-	update_repo_script_sh = f'if [ -d ./\"${scripts_dir}\" ]; then cd {scripts_dir}; git pull; else git clone {repo_link} \"${scripts_dir}\"; fi'
+	update_repo_script_sh = f'if [ -d ./{scripts_dir} ]; then cd {scripts_dir}; git pull; else git clone {repo_link} {scripts_dir}; fi'
 	subprocess.run(update_repo_script_sh, shell=True, text=True)
 
 
@@ -63,32 +62,39 @@ output_width = 100
 for path, id in installed_p2i.items():
 	short_id = id[-6:]
 	short_path = path.split('/')[-1]
+	possible_remote_path = './' + scripts_dir + '/'.join(path.split('/')[1:])
 	if not installed_is_const_p2i[path]:
 		if not id:
 			print(f'{get_aligned_string(str(f\"! var: deleting {short_path} without id\"), output_width)}: ', end='')
-			rc, __out = run_sp(['rm', path]).values()
-			print('success' if rc == 0 else f'! failed: {__out}')
+			rc, __out, __err = run_sp(['rm', path]).values()
+			print('success' if rc == 0 else f'! failed: {__err}')
 		else:
 			if id in remote_i2p.keys():
 				print(f'{get_aligned_string(str(f\"var: updating {short_path} from repo(id=..{short_id})\"), output_width)}: ', end='')
-				rc, __out = run_sp(['cp', remote_i2p[id], path]).values()
-				print('success' if rc == 0 else f'! failed: {__out}')
+				rc, __out, __err = run_sp(['cp', remote_i2p[id], path]).values()
+				print('success' if rc == 0 else f'! failed: {__err}')
 			else:
 				print(f'{get_aligned_string(str(f\"! var: deleting {short_path} wrong id(id=..{short_id})\"), output_width)}: ', end='')
-				rc, __out = run_sp(['rm', path]).values()
-				print('success' if rc == 0 else f'! failed: {__out}')
+				rc, __out, __err = run_sp(['rm', path]).values()
+				print('success' if rc == 0 else f'! failed: {__err}')
 	else:
 		print(f'const: {short_path}')
 
 for path, id in remote_p2i.items():
 	short_id = id[-6:]
 	short_path = path.split('/')[-1]
-	dist_name = './' + '/'.join(path.split('/')[2:])
+	dist_path = './' + '/'.join(path.split('/')[2:])
+	dist_folder = './' + '/'.join(path.split('/')[2:-1])
 	if not id in installed_i2p.keys():
-		if not dist_name in installed_paths or not installed_is_const_p2i[dist_name]:
+		if not dist_path in installed_paths:
 			print(f'{get_aligned_string(str(f\"var: installing {short_path} from repo(id=..{short_id})\"), output_width)}: ', end='')
-			rc, __out = run_sp(['cp', path, '.']).values()
-			print('success' if rc == 0 else f'! failed: {__out}')
+			rc, __out, __err = run_sp(['mkdir', '-p', dist_folder]).values()
+			rc, __out, __err = run_sp(['cp', path, dist_path]).values()
+			print('success' if rc == 0 else f'! failed: {__err}')
+		elif not installed_is_const_p2i[dist_path]:
+			print(f'{get_aligned_string(str(f\"var: installing {short_path} from repo(id=..{short_id})\"), output_width)}: ', end='')
+			rc, __out, __err = run_sp(['cp', path, dist_path]).values()
+			print('success' if rc == 0 else f'! failed: {__err}')
 "
 
 python3.11 -c "$python_script"
