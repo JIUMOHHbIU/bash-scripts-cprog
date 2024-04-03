@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # @id=f4aee6de86c0b4d1ce7aaa0be89a9280
-# @stable
+# @const
 
 python_script="\
 #!/usr/bin/python3.11
@@ -85,10 +85,12 @@ for path, id in installed_p2i.items():
 for path, id in remote_p2i.items():
 	short_id = id[-6:]
 	short_path = path.split('/')[-1]
+	dist_name = './' + '/'.join(path.split('/')[2:])
 	if not id in installed_i2p.keys():
-		print(f'{get_aligned_string(str(f\"var: installing {short_path} from repo(id=..{short_id})\"), output_width)}: ', end='')
-		rc, __out = run_sp(['cp', path, '.']).values()
-		print('success' if rc == 0 else f'! failed: {__out}')
+		if not dist_name in installed_paths or not installed_is_const_p2i[dist_name]:
+			print(f'{get_aligned_string(str(f\"var: installing {short_path} from repo(id=..{short_id})\"), output_width)}: ', end='')
+			rc, __out = run_sp(['cp', path, '.']).values()
+			print('success' if rc == 0 else f'! failed: {__out}')
 "
 
 python3.11 -c "$python_script"
