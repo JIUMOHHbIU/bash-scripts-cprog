@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# @id=28414bb9f456247d21974f51c9e5866b
+# @id=ceef39e38edbce19ef299d70d5b00c2e
 
 status="0"
 
@@ -8,7 +8,7 @@ status="0"
 tabs=""
 verbose_opt=""
 parallel=""
-if [ $# -gt 3 ]; then
+if [ $# -gt 5 ]; then
 	echo >&2 Неправильное число параметров
 	status="160"
 fi
@@ -64,25 +64,14 @@ if [ $# -gt 2 ]; then
 	fi
 fi
 
-#################################
-# Run tests on different builds #
-#################################
-builds=("release" "debug" "debug_asan" "debug_msan" "debug_ubsan")
+build="$4"
 if [ $status == "0" ]; then
-	if [ -n "$parallel" ]; then
-		parallel -k ./functional_tests_on_build.sh ::: "$tabs" ::: "$verbose_opt" ::: "$parallel" ::: "${builds[@]}"
-		rc=$?
-		if [ $status == "0" ]; then
-			status="$rc"
-		fi
-	else
-		for build in "${builds[@]}"; do
-			./functional_tests_on_build.sh "$tabs" "$verbose_opt" "$parallel" "$build"
-			rc=$?
-			if [ $status == "0" ]; then
-				status="$rc"
-			fi
-		done
+	if ! ./-_-.sh "$tabs" "$verbose_opt" "$build"; then
+		exit 1
+	fi
+
+	if  ! ./^_____^.sh "$tabs" "$verbose_opt" "$parallel" "$build"; then
+		exit 1
 	fi
 fi
 

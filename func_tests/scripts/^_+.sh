@@ -49,7 +49,7 @@ if [ $status == "0" ]; then
 		counter=$(find ./func_tests/data/"$group"*_in* 2> /dev/null | wc -l)
 		unsuccessful=0
 		if [ "$counter" -gt 0 ]; then
-			parallel "./func_tests/scripts/✨run_solo_test_case✨.sh" ::: "$tabs" ::: "$verbose_opt" ::: "$group" ::: func_tests/data/"$group"*in*
+			parallel ./func_tests/scripts/~_~.sh ::: "$tabs" ::: "$verbose_opt" ::: "$group" ::: func_tests/data/"$group"*in*
 			rc=$?
 			if [ $status == "0" ]; then
 				status="$rc"

@@ -44,33 +44,24 @@ if [ $# -gt 1 ]; then
 fi
 
 build="$3"
-current_hashsum="$4"
+dir_path=__tmp_out_"$build"
 if [ $status == "0" ]; then
-	if [ ! -d __tmp_out_"$build" ]; then
-		mkdir __tmp_out_"$build"
+	if [ ! -d "$dir_path" ]; then
+		mkdir "$dir_path"
 	fi
-	cp ./*.c __tmp_out_"$build"/
-	cp ./*.h __tmp_out_"$build"/ 2>/dev/null
-	cp build_"$build".sh __tmp_out_"$build"/
-	cp collect_coverage.sh __tmp_out_"$build"/
 
-	mkdir -p __tmp_out_"$build"/func_tests/data/
+# Remove all links
+	find ./"$dir_path"/ -maxdepth 3 -type l -delete
 
-	if [ -f __tmp_out_"$build"/tests_hashsum ]; then
-		old_hashsum=$(cat __tmp_out_"$build"/tests_hashsum)
-		if [ "$current_hashsum" != "$old_hashsum" ]; then
-			cp func_tests/data/*.txt __tmp_out_"$build"/func_tests/data/		
-			echo "$current_hashsum" > __tmp_out_"$build"/tests_hashsum
-		fi
-	else
-		cp func_tests/data/*.txt __tmp_out_"$build"/func_tests/data/	
-		echo "$current_hashsum" > __tmp_out_"$build"/tests_hashsum
-	fi
-	# cp func_tests/data/*.txt __tmp_out_"$build"/func_tests/data/	
-	mkdir -p __tmp_out_"$build"/func_tests/scripts/
-	cp func_tests/scripts/*.sh __tmp_out_"$build"/func_tests/scripts/
+# Setup dirs
+	mkdir -p "$dir_path"/func_tests/data/ "$dir_path"/func_tests/scripts/
 
-	cd __tmp_out_"$build" || exit 1
+# Create links
+	ln -sr ./*.c ./*.h build_"$build".sh collect_coverage.sh "$dir_path"/
+	ln -sr func_tests/scripts/*.sh "$dir_path"/func_tests/scripts/
+	ln -sr func_tests/data/*.txt  "$dir_path"/func_tests/data/
+
+	cd "$dir_path" || exit 1
 	prefix="build"
 	if t_output=$(./build_"$build".sh 2>&1); then
 		if [ "$verbose_opt" == '-v' ]; then

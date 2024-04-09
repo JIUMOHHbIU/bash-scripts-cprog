@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# @id=05590c05f66cf532d947f34b3735be9b
+# @id=78cba5a9761be74c367f2d52fe352c60
 
 status="0"
 
@@ -64,21 +64,17 @@ if [ $# -gt 2 ]; then
 	fi
 fi
 
-##############################
-# Run all build_*.sh scripts #
-##############################
 builds=("release" "debug" "debug_asan" "debug_msan" "debug_ubsan")
 if [ $status == "0" ]; then
-	current_hashsum=$(find ./func_tests/data/ -name "*.txt" ! -path '*__tmp_out*' -exec md5sum {} + | md5sum | cut -d ' ' -f 1)
 	if [ -n "$parallel" ]; then
-		parallel -k ./copy_on_build.sh ::: "$tabs" ::: "$verbose_opt" ::: "${builds[@]}" ::: "${current_hashsum[0]}"
+		parallel -k ./UwU.sh ::: "$tabs" ::: "$verbose_opt" ::: "$parallel" ::: "${builds[@]}"
 		rc=$?
 		if [ $status == "0" ]; then
 			status="$rc"
 		fi
 	else
 		for build in "${builds[@]}"; do
-			./copy_on_build.sh "$tabs" "$verbose_opt" "$build" "$current_hashsum"
+			./UwU.sh "$tabs" "$verbose_opt" "$parallel" "$build"
 			rc=$?
 			if [ $status == "0" ]; then
 				status="$rc"

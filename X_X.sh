@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# @id=ceef39e38edbce19ef299d70d5b00c2e
+# @id=60ec910591db8256caff4e1d27140f1f
 
 status="0"
 
@@ -8,7 +8,7 @@ status="0"
 tabs=""
 verbose_opt=""
 parallel=""
-if [ $# -gt 5 ]; then
+if [ $# -gt 3 ]; then
 	echo >&2 Неправильное число параметров
 	status="160"
 fi
@@ -64,15 +64,22 @@ if [ $# -gt 2 ]; then
 	fi
 fi
 
-build="$4"
-current_hashsum="$5"
 if [ $status == "0" ]; then
-	if ! ./copy_on_build.sh "$tabs" "$verbose_opt" "$build" "$current_hashsum"; then
-		exit 1
-	fi
-
-	if  ! ./functional_tests_on_build.sh "$tabs" "$verbose_opt" "$parallel" "$build"; then
-		exit 1
+	if [ -n "$parallel" ]; then
+		find . -name "*.sh" ! -path '*__tmp_out*' -exec parallel -k -j 4 ./-0-.sh ::: "$tabs" ::: "$verbose_opt" ::: {} +
+		rc=$?
+		if [ $status == "0" ]; then
+			status="$rc"
+		fi
+	else
+		while IFS= read -r -d '' script
+		do
+			./-0-.sh "$tabs" "$verbose_opt" "$script"
+			rc=$?
+			if [ $status == "0" ]; then
+				status="$rc"
+			fi
+		done <   <(find . -name "*.sh" ! -path '*__tmp*' -print0)
 	fi
 fi
 

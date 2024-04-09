@@ -71,16 +71,16 @@ fi
 
 if [ $status == "0" ]; then
 	prefixes=("CODESTYLE" "SHELLCHECK" "BUILD and USER FUNC TEST")
-	steps=("./check_codestyle.sh" "./check_scripts.sh" "./check_builds_and_test.sh")
+	steps=("./U_U.sh" "./X_X.sh" "./O_O.sh")
 	if [ -n "$parallel" ]; then
-		parallel -k --link ./run_singular_step.sh ::: "$tabs" ::: "$verbose_opt" ::: "$parallel" ::: "${prefixes[@]}" ::: "${steps[@]}"
+		parallel -k --link ./^^.sh ::: "$tabs" ::: "$verbose_opt" ::: "$parallel" ::: "${prefixes[@]}" ::: "${steps[@]}"
 		rc=$?
 		if [ $status == "0" ]; then
 			status="$rc"
 		fi
 	else
 		for (( i=0; i<${#steps[*]}; ++i)); do
-			./run_singular_step.sh "$tabs" "$verbose_opt" "$parallel" "${prefixes[$i]}" "${steps[$i]}"
+			./^^.sh "$tabs" "$verbose_opt" "$parallel" "${prefixes[$i]}" "${steps[$i]}"
 			rc=$?
 			if [ $status == "0" ]; then
 				status="$rc"
