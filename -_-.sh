@@ -50,6 +50,13 @@ if [ $status == "0" ]; then
 		mkdir "$dir_path"
 	fi
 
+	if [ -f ./"$dir_path"/clean.sh ]; then
+	# Remove all cache
+		cd "$dir_path" || exit 1
+		./clean.sh
+		cd .. || exit 1
+	fi
+
 # Remove all links
 	find ./"$dir_path"/ -maxdepth 3 -type l -delete
 
@@ -57,9 +64,11 @@ if [ $status == "0" ]; then
 	mkdir -p "$dir_path"/func_tests/data/ "$dir_path"/func_tests/scripts/
 
 # Create links
-	ln -sr ./*.c ./*.h build_"$build".sh collect_coverage.sh "$dir_path"/
-	ln -sr func_tests/scripts/*.sh "$dir_path"/func_tests/scripts/
-	ln -sr func_tests/data/*.txt  "$dir_path"/func_tests/data/
+	find . -maxdepth 1 -name "*.c" -exec ln -srt "$dir_path" {} +
+	find . -maxdepth 1 -name "*.h" -exec ln -srt "$dir_path" {} +
+	find ./func_tests/scripts/ -name "*.sh" -exec ln -srt "$dir_path"/func_tests/scripts/ {} +
+	find ./func_tests/data/ -name "*.txt" -exec ln -srt "$dir_path"/func_tests/data/ {} +
+	ln -sr build_"$build".sh collect_coverage.sh clean.sh "$dir_path"/
 
 	cd "$dir_path" || exit 1
 	prefix="build"

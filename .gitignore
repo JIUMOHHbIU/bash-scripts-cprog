@@ -1,4 +1,5 @@
 *.c
+*.h
 func_tests/scripts/comparator.sh
 *.txt
 *.exe
