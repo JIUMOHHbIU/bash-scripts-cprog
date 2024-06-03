@@ -1,112 +1,83 @@
 #!/bin/bash
 
-# @id=6b146b6ed6cae7b4fc55e3b028dd444e
-
 status="0"
 
-passed="\033[1;32m(PASSED)\033[0m"
-failed="\033[1;31m(FAILED)\033[0m"
+run_step() {
+    rc="0"
 
-one_level_tab="    "
+    passed="\033[1;32m(PASSED)\033[0m"
+    failed="\033[1;31m(FAILED)\033[0m"
 
-# Check options
-tabs=""
-verbose_opt=""
-parallel=""
-if [ $# -gt 3 ]; then
-	echo >&2 Неправильное число параметров
-	status="160"
-fi
+    one_level_tab=$(./tab_size.sh)
 
-if [ $# -gt 0 ]; then
-	if [ "$1" == '-v' ]; then
-		verbose_opt='-v'
-	else
-		if eval echo "$1" | grep -Eo "^	*$"; then
-			tabs="$tabs""$1"
-		else
-			if [ "$1" == "--parallel" ]; then
-				parallel="--parallel"
-			else
-				echo >&2 Неправильный параметр 1: "$1"
-				status="160"
-			fi
-		fi
-	fi
-fi
+    tabs="$1"
+    verbose_opt="$2"
+    parallel="$3"
+    step="$4"
+    prefix="$5"
 
-if [ $# -gt 1 ]; then
-	if [ "$2" == '-v' ]; then
-		verbose_opt='-v'
-	else
-		if eval echo "$2" | grep -Eo "^	*$"; then
-			tabs="$tabs""$2"
-		else
-			if [ "$2" == "--parallel" ]; then
-				parallel="--parallel"
-			else
-				echo >&2 Неправильный параметр 2: "$2"
-				status="160"
-			fi
-		fi
-	fi
-fi
+    echo -n "$tabs""$prefix"
+    if t_output=$("$step" "$tabs""$one_level_tab" "$verbose_opt" "$parallel" 2>&1); then
+        echo -e " $passed"
+    else
+        rc="1"
+        echo -e " $failed"
+    fi
 
-if [ $# -gt 2 ]; then
-	if [ "$3" == '-v' ]; then
-		verbose_opt='-v'
-	else
-		if eval echo "$3" | grep -Eo "^	*$"; then
-			tabs="$tabs""$3"
-		else
-			if [ "$3" == "--parallel" ]; then
-				parallel="--parallel"
-			else
-				echo >&2 Неправильный параметр 3: "$3"
-				status="160"
-			fi
-		fi
-	fi
+    if [ -n "$t_output" ]; then
+        echo -e "$t_output"
+    fi
+
+    return $rc
+}
+export -f run_step
+
+tabs="$1"
+verbose_opt="$2"
+parallel="$3"
+
+prefixes=("CODESTYLE" "SHELLCHECK" "BUILD")
+steps=("./check_codestyle.sh" "./check_scripts.sh" "./check_builds.sh")
+if [ -n "$parallel" ]; then
+    parallel -k --link run_step ::: "$tabs" ::: "$verbose_opt" ::: "$parallel" ::: "${steps[@]}" ::: "${prefixes[@]}"
+    rc=$?
+    if [ $status == "0" ]; then
+        status="$rc"
+    fi
+else
+    for (( i=0; i<${#steps[*]}; ++i)); do
+        run_step "$tabs" "$verbose_opt" "$parallel" "${steps[$i]}" "${prefixes[$i]}"
+        rc=$?
+        if [ $status == "0" ]; then
+            status="$rc"
+        fi
+    done
 fi
 
 if [ $status == "0" ]; then
-	prefixes=("CODESTYLE" "SHELLCHECK" "BUILD and USER FUNC TEST")
-	steps=("./U_U.sh" "./X_X.sh" "./O_O.sh")
-	if [ -n "$parallel" ]; then
-		parallel -k --link ./^^.sh ::: "$tabs" ::: "$verbose_opt" ::: "$parallel" ::: "${prefixes[@]}" ::: "${steps[@]}"
-		rc=$?
-		if [ $status == "0" ]; then
-			status="$rc"
-		fi
-	else
-		for (( i=0; i<${#steps[*]}; ++i)); do
-			./^^.sh "$tabs" "$verbose_opt" "$parallel" "${prefixes[$i]}" "${steps[$i]}"
-			rc=$?
-			if [ $status == "0" ]; then
-				status="$rc"
-			fi
-		done
-	fi
+    # Run functional_tests
+    prefix="FUNCTIONAL TESTS"
+    step="./check_functional_tests.sh"
+    run_step "$tabs" "$verbose_opt" "$parallel" "$step" "$prefix"
+    rc=$?
+    if [ $status == "0" ]; then
+        status="$rc"
+    fi
 fi
 
 if [ $status == "0" ]; then
-	# Collect coverage
-	cd __tmp_out_debug || exit 1
+    # Collect coverage
+    cd __tmp_out_debug || exit 1
 
-	prefix="COVERAGE"
-	echo -n "$tabs""$prefix"
-	if t_output=$(./collect_coverage.sh "$tabs""$one_level_tab" "$verbose_opt" "$parallel" 2>&1); then
-		echo -e " $passed"
-	else
-		status="1"
-		echo -e " $failed"
-	fi
+    prefix="COVERAGE"
+    step="./collect_coverage.sh"
+    run_step "$tabs" "$verbose_opt" "$parallel" "$step" "$prefix"
+    rc=$?
+    if [ $status == "0" ]; then
+        status="$rc"
+    fi
 
-	if [ -n "$t_output" ]; then
-		echo -e "$t_output"
-	fi
-
-	cd ..
+    cd ..
 fi
 
 exit $status

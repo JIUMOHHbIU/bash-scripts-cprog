@@ -1,15 +1,18 @@
 #!/bin/bash
 
-# @id=ca88af60f876ce55f959cafa0a6e0b13
+target="app.exe"
 
-gcc_compile_args=("-std=c99" "-Wall" "-Werror" "-Wpedantic" "-Wextra" "-Wfloat-equal" "-Wfloat-conversion" "-Wvla" "-fdiagnostics-color")
+gcc_compile_args_debug=("-g" "-DDEBUG" "-fprofile-arcs" "-ftest-coverage" "-O0")
+gcc_compile_args_default=("-c" "-std=c99" "-Wall" "-Werror" "-Wpedantic" "-Wextra" "-Wfloat-equal" "-Wfloat-conversion" "-Wvla" "-fdiagnostics-color")
 
-if ! gcc "${gcc_compile_args[@]}" -g -DDEBUG -c -fprofile-arcs -ftest-coverage -O0 ./*.c; then
-	exit 1
+gcc_link_args_debug=("-fprofile-arcs")
+
+if ! gcc "${gcc_compile_args_default[@]}" "${gcc_compile_args_debug[@]}" ./*.c; then
+    exit 1
 fi
 
-if ! gcc -fprofile-arcs -o app.exe ./*.o -lm; then
-	exit 1
+if ! gcc "${gcc_link_args_debug[@]}" -o "$target" ./*.o -lm; then
+    exit 1
 fi
 
 exit 0
