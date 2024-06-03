@@ -7,7 +7,7 @@ clang_compile_args_default=("-c" "-std=c99" "-Weverything" "-Wno-used-but-marked
 
 clang_link_args_debug_ubsan=("-fsanitize=undefined")
 
-if ! clang-17 "${clang_compile_args_default[@]}" "${clang_compile_args_debug_ubsan[@]}" -g ./*.c; then
+if ! clang-17 "${clang_compile_args_default[@]}" "${clang_compile_args_debug_ubsan[@]}" ./*.c; then
     exit 1
 fi
 
