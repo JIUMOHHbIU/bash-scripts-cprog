@@ -42,9 +42,7 @@ build_into_tmpdir() {
     cd "$dir_path" || return 1
     prefix="build"
     if t_output=$(./build_"$build".sh 2>&1); then
-        if [ "$verbose_opt" == '-v' ]; then
-            echo -e "$tabs""$prefix" "$build": "$pass"
-        fi
+        echo -e "$tabs""$prefix" "$build": "$pass"
     else
         rc="1"
         echo -e "$tabs""$prefix" "$build": "$fail"
