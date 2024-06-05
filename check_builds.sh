@@ -49,6 +49,8 @@ build_into_tmpdir() {
     fi
     ./tabulate.sh "$tabs""$one_level_tab" "$t_output"
 
+    cd ..
+
     return $rc
 }
 export -f build_into_tmpdir
