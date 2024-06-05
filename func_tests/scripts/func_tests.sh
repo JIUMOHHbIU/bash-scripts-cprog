@@ -83,7 +83,7 @@ for group in "${groups[@]}"; do
     failed=0
     if [ "$counter" -gt 0 ]; then
         if [ -n "$parallel" ]; then
-            parallel case_wrapper -k ::: "$tabs" ::: "$verbose_opt" ::: "$group" ::: func_tests/data/"$group"*in*
+            parallel -k case_wrapper ::: "$tabs" ::: "$verbose_opt" ::: "$group" ::: func_tests/data/"$group"*in*
             rc=$?
             if [ $status == "0" ]; then
                 status="$rc"
