@@ -15,13 +15,13 @@ tmpfile2=$(mktemp /tmp/tfile2.XXXXXX)
 
 while IFS= read -r line; do
     if [[ $line =~ $pattern ]]; then
-        "$line" >> "$tmpfile1"
+        echo "$line" >> "$tmpfile1"
     fi
 done <<< "$(tr "$file_1" ' ' '\n')"
 
 while IFS= read -r line; do
     if [[ $line =~ $pattern ]]; then
-        "$line" >> "$tmpfile1"
+        echo "$line" >> "$tmpfile1"
     fi
 done <<< "$(tr "$file_2" ' ' '\n')"
 

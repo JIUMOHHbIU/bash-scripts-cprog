@@ -12,11 +12,11 @@ tmpfile1=$(mktemp /tmp/tfile1.XXXXXX)
 tmpfile2=$(mktemp /tmp/tfile2.XXXXXX)
 
 while IFS= read -r line; do
-    "$line" >> "$tmpfile1"
+    echo "$line" >> "$tmpfile1"
 done <<< "$(tr "$file_1" ' ' '\n')"
 
 while IFS= read -r line; do
-    "$line" >> "$tmpfile2"
+    echo "$line" >> "$tmpfile2"
 done <<< "$(tr "$file_2" ' ' '\n')"
 
 if ! [[ $(md5sum < "$tmpfile1") == $(md5sum < "$tmpfile2") ]]; then
