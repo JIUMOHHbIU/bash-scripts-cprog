@@ -22,7 +22,8 @@ case_wrapper() {
     application_out="$testing_folder"/my_$(basename "${test_out}")
     appication_rc="${application_out//out/rc}"
 
-    if comparator_output=$(./func_tests/scripts/"$group"_case.sh "$test_in" "$test_out" "$verbose_opt"); then
+
+    if comparator_output=$(cd ./func_tests/scripts/ && ./"$group"_case.sh "$test_in" "$test_out" "$verbose_opt" && cd ../../); then
         if [ "$verbose_opt" == '-v' ]; then
             echo -e "$tabs""$group" "$filename": "$pass"
         fi
