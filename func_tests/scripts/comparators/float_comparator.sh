@@ -17,13 +17,13 @@ while IFS= read -r line; do
     if [[ $line =~ $pattern ]]; then
         echo "$line" >> "$tmpfile1"
     fi
-done <<< "$(tr "$file_1" ' ' '\n')"
+done <<< "$(< "$file_1" tr ' ' '\n')"
 
 while IFS= read -r line; do
     if [[ $line =~ $pattern ]]; then
         echo "$line" >> "$tmpfile1"
     fi
-done <<< "$(tr "$file_2" ' ' '\n')"
+done <<< "$(< "$file_2" tr ' ' '\n')"
 
 
 if ! [[ $(md5sum < "$tmpfile1") == $(md5sum < "$tmpfile2") ]]; then

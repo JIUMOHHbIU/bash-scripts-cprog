@@ -13,11 +13,11 @@ tmpfile2=$(mktemp /tmp/tfile2.XXXXXX)
 
 while IFS= read -r line; do
     echo "$line" >> "$tmpfile1"
-done <<< "$(tr "$file_1" ' ' '\n')"
+done <<< "$(< "$file_1" tr ' ' '\n')"
 
 while IFS= read -r line; do
     echo "$line" >> "$tmpfile2"
-done <<< "$(tr "$file_2" ' ' '\n')"
+done <<< "$(< "$file_2" tr ' ' '\n')"
 
 if ! [[ $(md5sum < "$tmpfile1") == $(md5sum < "$tmpfile2") ]]; then
     if [[ "$verbose_opt" == '-v' ]]; then
