@@ -21,7 +21,7 @@ done <<< "$(< "$file_1" tr ' ' '\n')"
 
 while IFS= read -r line; do
     if [[ $line =~ $pattern ]]; then
-        echo "$line" >> "$tmpfile1"
+        echo "$line" >> "$tmpfile2"
     fi
 done <<< "$(< "$file_2" tr ' ' '\n')"
 
